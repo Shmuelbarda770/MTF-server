@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { createApiResponse, ApiResponse } from '../util/ApiResponse'; // תיקון הייבוא
 import { getCollection, connect, close } from '../util/Mongo';
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser: any = async (req: Request, res: Response) => {
     const userData = req.body;
 
     const errors:any = validateUser(userData);

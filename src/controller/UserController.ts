@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { createApiResponse, ApiResponse } from '../util/ApiResponse';
 import { getCollection, connect, close } from '../util/Mongo';
-
+import User from '../models/userModel';
 
 export const createUser:any = async (req: Request, res: Response) => {
     const userData = req.body;
@@ -28,6 +28,30 @@ export const createUser:any = async (req: Request, res: Response) => {
         res.status(500).json(response); 
     } finally {
         await close(); 
+    }
+};
+
+export const getSingleUser: any = async (req: Request, res: Response) => {
+    const userId = req.params.id;
+
+    try {
+        // Validate that userId is a valid MongoDB ObjectId
+        if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json(createApiResponse(false, null, "Invalid user ID format."));
+        }
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json(createApiResponse(false, null, "User not found."));
+        }
+
+        const response: ApiResponse = createApiResponse(true, user, "User retrieved successfully.");
+        res.status(200).json(response);
+    } catch (error: any) {
+        console.error("Error fetching user:", error);
+        const response: ApiResponse = createApiResponse(false, null, "Failed to retrieve user.", null, error.message);
+        res.status(500).json(response);
     }
 };
 

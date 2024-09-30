@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { createApiResponse, ApiResponse } from '../util/ApiResponse';
-import { createApiResponse, ApiResponse } from '../util/ApiResponse';
 import { getCollection, connect, close } from '../util/Mongo';
 import mongoose from 'mongoose';
 import User from '../models/userModel';

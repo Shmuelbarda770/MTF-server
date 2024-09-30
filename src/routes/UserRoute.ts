@@ -1,10 +1,10 @@
 import express from 'express';
-import { createUser } from '../controller/UserController'; 
+import {createUser,getAllUsers,searchInput} from '../controller/UserController'; 
 
 const router = express.Router();
 
 router.post('/api/users', createUser);
-
-
+router.get('/users/',getAllUsers)
+router.get('/users/searchUsers', searchInput)
 
 export default router;

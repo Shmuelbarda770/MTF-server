@@ -12,6 +12,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "mysql2": "^3.11.3",
+    "sequelize": "^6.37.3",
+    "swagger-ui-express": "^5.0.1"
+=======
+>>>>>>> d83d7e7 (search user and get all users)
     "@types/mongodb": "4.0.7",
     "cors": "2.8.5",
     "dotenv": "16.4.5",
@@ -22,6 +33,10 @@
     "npm": "10.8.3",
     "sequelize": "6.37.3",
     "swagger-ui-express": "5.0.1"
+<<<<<<< HEAD
+=======
+>>>>>>> 43dc74c (search user and get all users)
+>>>>>>> d83d7e7 (search user and get all users)
   },
   "devDependencies": {
     "@types/express": "5.0.0",

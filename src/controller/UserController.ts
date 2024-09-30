@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { createApiResponse, ApiResponse } from '../util/ApiResponse'; // תיקון הייבוא
 import { getCollection, connect, close } from '../util/Mongo';
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser: any = async (req: Request, res: Response) => {
     const userData = req.body;
 
     const errors:any = validateUser(userData);
@@ -13,7 +13,12 @@ export const createUser = async (req: Request, res: Response) => {
     try {
         await connect();
         const users = getCollection("users");
-        const userData = req.body;
+
+        const existingUser = await users.findOne({ email: userData.email });
+        if (existingUser) {
+            return res.status(400).json(createApiResponse(false, null, "User already exists", null, "User already exists"));
+        }
+        
         await users.insertOne(userData);
         const response: ApiResponse = createApiResponse(true, userData, "User created");
         res.status(201).json(response);

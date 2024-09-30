@@ -22,9 +22,11 @@ export const createUser:any = async (req: Request, res: Response) => {
         const response: ApiResponse = createApiResponse(true, userData, "User created");
         res.status(201).json(response);
 
-    }catch(error){
-        console.log(error)
-    }finally {
+    } catch (error: any) {
+        console.log(error);
+        const response: ApiResponse = createApiResponse(false, null, "User creation failed", null, error.message);
+        res.status(500).json(response); 
+    } finally {
         await close(); 
     }
 };

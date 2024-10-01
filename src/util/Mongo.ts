@@ -1,5 +1,10 @@
 import mongoose from 'mongoose';
-const uri = 'mongodb+srv://asaf:Aa123456@cluster0.eslsq.mongodb.net/MTF-DB?retryWrites=true&w=majority';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+const uri = process.env.MONGODB_URI || '';
 
 export const connect = async () => {
     try {

@@ -3,12 +3,11 @@ import { createApiResponse, ApiResponse } from '../util/ApiResponse';
 import { getCollection, connect, close } from '../util/Mongo';
 import mongoose from 'mongoose';
 import User from '../models/userModel';
+import { validateId, validateName, validateGmail, validateRole, validatePhoneNumber } from '../util/validate';
 
 
 
-
-export const createUser: any = async (req: Request, res: Response) => {
-
+export const createUser:any = async (req: Request, res: Response) => {
     const userData = req.body;
 
     try {
@@ -31,6 +30,80 @@ export const createUser: any = async (req: Request, res: Response) => {
         res.status(500).json(response);
     } finally {
         await close();
+    }
+};
+
+// עדכון משתמש קיים
+export const updateUser = async (req: Request, res: Response): Promise<void> => {
+    const userId = req.params.id;
+    const updateData = req.body;
+
+    // ביצוע ולידציות
+    const errors: string[] = [];
+
+    if (!validateId(Number(userId))) {
+        errors.push('Invalid user ID');
+    }
+
+    if (updateData.name && !validateName(updateData.name)) {
+        errors.push('Invalid name');
+    }
+
+    if (updateData.email && !validateGmail(updateData.email)) {
+        errors.push('Invalid Gmail address');
+    }
+
+    const validRoles:any = ['admin', 'user', 'moderator']; // הגדרת תפקידים חוקיים
+    if (updateData.role && !validateRole(updateData.role, validRoles)) {
+        errors.push('Invalid role');
+    }
+
+    if (updateData.phoneNumber && !validatePhoneNumber(updateData.phoneNumber)) {
+        errors.push('Invalid phone number');
+    }
+
+    if (errors.length > 0) {
+        res.status(400).json({ message: 'Validation failed', errors });
+        return;
+    }
+
+    try {
+        // עדכון המשתמש לפי ID
+        const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
+
+        if (!updatedUser) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        res.status(200).json(updatedUser);
+    } catch (error: any) {
+        res.status(500).json({ message: 'Error updating user', error: error.message });
+    }
+};
+
+
+export const getSingleUser: any = async (req: Request, res: Response) => {
+    const userId = req.params.id;
+
+    try {
+        // Validate that userId is a valid MongoDB ObjectId
+        if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json(createApiResponse(false, null, "Invalid user ID format."));
+        }
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json(createApiResponse(false, null, "User not found."));
+        }
+
+        const response: ApiResponse = createApiResponse(true, user, "User retrieved successfully.");
+        res.status(200).json(response);
+    } catch (error: any) {
+        console.error("Error fetching user:", error);
+        const response: ApiResponse = createApiResponse(false, null, "Failed to retrieve user.", null, error.message);
+        res.status(500).json(response);
     }
 };
 

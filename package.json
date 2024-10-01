@@ -1,12 +1,19 @@
 {
+<<<<<<< HEAD
   "type": "module",
+=======
+<<<<<<< HEAD
+=======
+  
+>>>>>>> 4054241 (cleaned all problems)
+>>>>>>> 657ccc7 (cleaned all problems)
   "name": "improve-server",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/app.js",
-    "dev": "nodemon --files src/app.ts"
+    "dev": "nodemon --exec ts-node src/app.ts"
   },
   "keywords": [],
   "author": "",

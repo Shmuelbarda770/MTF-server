@@ -3,6 +3,7 @@ import { createApiResponse, ApiResponse } from '../util/ApiResponse';
 import { getCollection, connect, close } from '../util/Mongo';
 import mongoose from 'mongoose';
 import User from '../models/userModel';
+import { validateId, validateName, validateGmail, validateRole, validatePhoneNumber } from '../util/validate';
 
 
 
@@ -37,6 +38,35 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     const userId = req.params.id;
     const updateData = req.body;
 
+    // ביצוע ולידציות
+    const errors: string[] = [];
+
+    if (!validateId(Number(userId))) {
+        errors.push('Invalid user ID');
+    }
+
+    if (updateData.name && !validateName(updateData.name)) {
+        errors.push('Invalid name');
+    }
+
+    if (updateData.email && !validateGmail(updateData.email)) {
+        errors.push('Invalid Gmail address');
+    }
+
+    const validRoles:any = ['admin', 'user', 'moderator']; // הגדרת תפקידים חוקיים
+    if (updateData.role && !validateRole(updateData.role, validRoles)) {
+        errors.push('Invalid role');
+    }
+
+    if (updateData.phoneNumber && !validatePhoneNumber(updateData.phoneNumber)) {
+        errors.push('Invalid phone number');
+    }
+
+    if (errors.length > 0) {
+        res.status(400).json({ message: 'Validation failed', errors });
+        return;
+    }
+
     try {
         // עדכון המשתמש לפי ID
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
@@ -51,6 +81,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
         res.status(500).json({ message: 'Error updating user', error: error.message });
     }
 };
+
 
 export const getSingleUser: any = async (req: Request, res: Response) => {
     const userId = req.params.id;

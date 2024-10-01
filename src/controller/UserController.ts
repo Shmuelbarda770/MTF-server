@@ -32,6 +32,26 @@ export const createUser:any = async (req: Request, res: Response) => {
     }
 };
 
+// עדכון משתמש קיים
+export const updateUser = async (req: Request, res: Response): Promise<void> => {
+    const userId = req.params.id;
+    const updateData = req.body;
+
+    try {
+        // עדכון המשתמש לפי ID
+        const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
+
+        if (!updatedUser) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        res.status(200).json(updatedUser);
+    } catch (error: any) {
+        res.status(500).json({ message: 'Error updating user', error: error.message });
+    }
+};
+
 export const getSingleUser: any = async (req: Request, res: Response) => {
     const userId = req.params.id;
 

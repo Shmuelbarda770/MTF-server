@@ -1,10 +1,11 @@
 import express, { Request, Response } from 'express';
 import SwaggerUI from 'swagger-ui-express';
-import dotenv from 'dotenv';
+// import dotenv from 'dotenv';
+
 const swagger  = require('../swagger.json')
 import userRoutes from './routes/UserRoute'
 
-dotenv.config();
+// dotenv.config();
 const app = express();
 
 const port = process.env.PORT || 3000;

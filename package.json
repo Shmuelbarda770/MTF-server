@@ -1,12 +1,12 @@
 {
-  "type": "module",
+  
   "name": "improve-server",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/app.js",
-    "dev": "nodemon --files src/app.ts"
+    "dev": "nodemon --exec ts-node src/app.ts"
   },
   "keywords": [],
   "author": "",

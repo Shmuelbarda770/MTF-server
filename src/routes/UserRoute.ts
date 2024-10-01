@@ -4,7 +4,7 @@ import {createUser, getAllUsers, searchInput, getSingleUser} from '../controller
 
 const router = express.Router();
 
-router.post('/api/users', createUser);
+router.post('/createUser', createUser);
 
 router.get('/users/',getAllUsers);
 

@@ -96,7 +96,7 @@ export const deleteUser: any = async (req: Request, res: Response) => {
     const { email } = req.body;
     try {
         await connect();
-        const user = await User.findOne({ email ““: email })
+        const user = await User.findOne({ email : email })
         if (!user) {
             return res.status(404).json(createApiResponse(false, null, "User not found", null, null));
         }

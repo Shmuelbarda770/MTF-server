@@ -4,7 +4,7 @@ import {createUser, getAllUsers, searchInput, getSingleUser, updateUser} from '.
 
 const router = express.Router();
 
-router.post('/createUsers', createUser);
+router.post('/createUser', createUser);
 
 router.get('/users/',getAllUsers);
 

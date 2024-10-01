@@ -1,31 +1,17 @@
-import { MongoClient, ServerApiVersion, Db,Document, Collection} from 'mongodb';
+import mongoose from 'mongoose';
+const uri = 'mongodb+srv://asaf:Aa123456@cluster0.eslsq.mongodb.net/MTF-DB?retryWrites=true&w=majority';
 
+export const connect = async () => {
+    try {
+        await mongoose.connect(uri);
+        console.log('MongoDB connected');
+    } catch (error) {
+        console.error('MongoDB connection error:', error);
+        throw error;
+    }
+};
 
-const uri :string ="mongodb+srv://Mtf:MtfDB@cluster0.cyswu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-
-const client: MongoClient = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
-
-export async function connect(): Promise<void> {
-  try {
-    await client.connect();
-    await client.db("MtfProject").command({ ping: 1 });
-    console.log("Connected to MongoDB");
-  } catch (error) {
-    console.error("Failed to connect to MongoDB", error);
-  }
-}
-
-export function getCollection(collectionName: string): Collection<Document> {
-  const db: Db = client.db('');
-  return db.collection<Document>(collectionName);
-}
-
-export async function close(): Promise<void> {
-  await client.close();
-}
+export const close = async () => {
+    await mongoose.connection.close();
+    console.log('MongoDB connection closed');
+};

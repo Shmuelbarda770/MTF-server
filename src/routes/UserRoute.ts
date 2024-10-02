@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post('/createUser', createUser);
 
-router.get('/users/',getAllUsers);
+router.get('/users',getAllUsers);
 
 router.get('/users/searchUsers', searchInput);
 

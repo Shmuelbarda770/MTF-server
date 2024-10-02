@@ -83,7 +83,8 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     }
 };
 
-
+// <!> This is a function designed to search for an ID from the given parameter. 
+// It's important to note that this ID belongs to MongoDB and not to the individual themselves. <!>
 export const getSingleUser: any = async (req: Request, res: Response) => {
     const userId = req.params.id;
 

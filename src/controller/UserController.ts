@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { createApiResponse, ApiResponse } from '../util/ApiResponse';
 import { connect, close } from '../util/Mongo';
-import mongoose from 'mongoose';
+import XLSX from 'xlsx';
 import User from '../models/userModel';
 import { validateId, validateName, validateGmail, validateRole, validatePhoneNumber } from '../util/validate';
 
@@ -113,7 +113,29 @@ export const getSingleUser: any = async (req: Request, res: Response) => {
     }
 };
 
+const exportUsersToExcel = async (): Promise<Buffer> => {
+    const users = await User.find().lean();
+    const worksheet = XLSX.utils.json_to_sheet(users);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Users');
+  
+    return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+};
 
+export const exportUsersList = async (req: Request, res: Response) => {
+    try {
+        await connect(); // התחברות למסד הנתונים
+        const excelData = await exportUsersToExcel();
+        res.setHeader('Content-Disposition', 'attachment; filename=users.xlsx');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.send(excelData);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error exporting users');
+    } finally {
+        await close(); // סגירת החיבור למסד הנתונים
+    }
+};
 
 export const getAllUsers = async (req: Request, res: Response) => {
     try {

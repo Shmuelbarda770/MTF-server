@@ -1,23 +1,26 @@
 import express, { Request, Response } from 'express';
 import SwaggerUI from 'swagger-ui-express';
-import Route from './routes/Route'
+import Route from './routes/Route';
 import cors from 'cors';
-// import dotenv from 'dotenv';
-const swagger  = require('../swagger.json')
+import { connect } from './util/Mongo'; // Import the MongoDB connection function
 
-// dotenv.config();
+const swagger = require('../swagger.json');
+
 const app = express();
-app.use(cors());
 const port = process.env.PORT || 3000;
 
+app.use(cors());
 app.use(express.json());
 app.use(Route);
 app.use('/swagger', SwaggerUI.serve, SwaggerUI.setup(swagger));
 
+// Connect to MongoDB once when the server starts
+connect().then(() => {
+  console.log('MongoDB connected successfully');
 
-
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+}).catch(error => {
+  console.error('Failed to connect to MongoDB:', error);
 });
-

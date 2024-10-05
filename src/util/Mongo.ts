@@ -7,16 +7,22 @@ dotenv.config();
 const uri = process.env.MONGODB_URI || '';
 
 export const connect = async () => {
+  if (mongoose.connection.readyState === 0) {  // Only connect if not already connected
     try {
-        await mongoose.connect(uri);
-        console.log('MongoDB connected');
+      await mongoose.connect(uri);
     } catch (error) {
-        console.error('MongoDB connection error:', error);
-        throw error;
+      console.error('MongoDB connection error:', error);
+      throw error;
     }
+  } else {
+    console.log('MongoDB already connected');
+  }
 };
 
+// Remove or keep the close function for graceful shutdowns
 export const close = async () => {
+  if (mongoose.connection.readyState !== 0) {
     await mongoose.connection.close();
     console.log('MongoDB connection closed');
+  }
 };

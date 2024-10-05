@@ -3,7 +3,7 @@ import { createApiResponse, ApiResponse } from '../util/ApiResponse';
 import { connect, close } from '../util/Mongo';
 import mongoose from 'mongoose';
 import User from '../models/userModel';
-import { validateId, validateName, validateGmail, validateRole, validatePhoneNumber } from '../util/validate';
+import { validateName, validateGmail, validateRole, validatePhoneNumber } from '../util/validate';
 
 
 
@@ -39,15 +39,9 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     const userId = req.params.id;
     const updateData = req.body;
 
-    // Log the MongoDB connection state and incoming request details
-    console.log('MongoDB connection state:', mongoose.connection.readyState); // Should be 1 if connected
-    console.log('Incoming userId:', userId);
-    console.log('Incoming updateData:', updateData);
-
-    // Perform validations
     const errors: string[] = [];
 
-    // Temporarily commenting out name and email validation for testing
+  
     if (updateData.name && !validateName(updateData.name)) {
         errors.push('Invalid name');
     }
@@ -56,7 +50,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
         errors.push('Invalid Gmail address');
     }
 
-    const validRoles: any = ['Admin', 'Viewer', 'Editor']; // Legal roles
+    const validRoles: any = ['Admin', 'Viewer', 'Editor'];
     if (updateData.role && !validateRole(updateData.role, validRoles)) {
         errors.push('Invalid role');
     }
@@ -71,8 +65,6 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     }
 
     try {
-        // Log the update attempt
-        console.log('Attempting to update user:', userId);
 
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
 
@@ -81,8 +73,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
             return;
         }
 
-        // Log the successful update
-        console.log('User updated successfully:', updatedUser);
+
         res.status(200).json(updatedUser);
     } catch (error: any) {
         console.error('Error during user update:', error.message);

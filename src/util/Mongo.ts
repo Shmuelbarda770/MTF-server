@@ -1,31 +1,28 @@
-import { MongoClient, ServerApiVersion, Db,Document, Collection} from 'mongodb';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
+// Load environment variables
+dotenv.config();
 
-const uri :string ="mongodb+srv://Mtf:MtfDB@cluster0.cyswu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = process.env.MONGODB_URI || '';
 
-const client: MongoClient = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
+export const connect = async () => {
+  if (mongoose.connection.readyState === 0) {  // Only connect if not already connected
+    try {
+      await mongoose.connect(uri);
+    } catch (error) {
+      console.error('MongoDB connection error:', error);
+      throw error;
+    }
+  } else {
+    console.log('MongoDB already connected');
   }
-});
+};
 
-export async function connect(): Promise<void> {
-  try {
-    await client.connect();
-    await client.db("MtfProject").command({ ping: 1 });
-    console.log("Connected to MongoDB");
-  } catch (error) {
-    console.error("Failed to connect to MongoDB", error);
+// Remove or keep the close function for graceful shutdowns
+export const close = async () => {
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.connection.close();
+    console.log('MongoDB connection closed');
   }
-}
-
-export function getCollection(collectionName: string): Collection<Document> {
-  const db: Db = client.db('');
-  return db.collection<Document>(collectionName);
-}
-
-export async function close(): Promise<void> {
-  await client.close();
-}
+};

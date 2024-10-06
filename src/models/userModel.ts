@@ -1,30 +1,20 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Schema, model } from 'mongoose';
 
 export interface IUser extends Document {
-  Id: Number,
   role: String, 
-  FirstName: String,
-  LastName: String,
-  PhoneNumber: String,
-  Email: String,
-  AccountName: String,
-  CompanyName: String,
-  InvoiceName: String,
-
+  firstName: String,
+  lastName: String,
+  phoneNumber: String,
+  email: String,
 }
 
-
-// Define the User schema
+// Role schema can be separated if you plan to expand it in the future.
 const userSchema = new Schema({
-  Id: { type: Number, required: true },
-  role: { type: String, required: true, enum: ['Owner'] },
-  FirstName: { type: String, required: true },
-  LastName: { type: String, required: true },
-  PhoneNumber: { type: String, required: true },
-  Email: { type: String, required: true },
-  AccountName: { type: String, unique: true, required: true },
-  CompanyName: { type: String, unique: true, required: true },
-  InvoiceName: { type: String, required: true },
+  role: { type: String, enum: ['Viewer', 'Admin', 'Editor'] },
+  firstName: { type: String},
+  lastName: { type: String },
+  phoneNumber: { type: String },
+  email: { type: String},
 });
 
 // Create the User model

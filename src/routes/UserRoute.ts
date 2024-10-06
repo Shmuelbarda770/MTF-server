@@ -1,13 +1,18 @@
 import express from 'express';
-import {createUser,getAllUsers,login,searchInput} from '../controller/UserController'; 
+import {createUser,getAllUsers,searchInput,login,getSingleUser,updateUser} from '../controller/UserController'; 
 
 const router = express.Router();
 
-router.post('/api/users', createUser);
-router.get('/users/',getAllUsers)
-router.get('/users/searchUsers', searchInput)
-router.post('/login', login)
+router.post('/createUser', createUser);
 
+router.get('/users',getAllUsers);
 
+router.get('/users/searchUsers', searchInput);
+
+router.get('/user/:id', getSingleUser);
+
+router.patch('/updateUser/:id', updateUser);
+
+router.post('/login', login);
 
 export default router;

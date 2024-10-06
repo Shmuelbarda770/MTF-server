@@ -4,8 +4,6 @@ import { connect, close } from '../util/Mongo';
 import mongoose from 'mongoose';
 import User ,{IUser} from '../models/userModel';
 import { validateName, validateGmail, validateRole, validatePhoneNumber } from '../util/validate';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 
 export const createUser: any = async (req: Request, res: Response) => {
     const userData = req.body;
@@ -194,10 +192,7 @@ export const login: any = async (req: Request, res: Response) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // יצירת טוקן
-        const token = jwt.sign({ id: user.Id }, 'YOUR_SECRET_KEY', { expiresIn: '1h' });
-
-        return res.status(200).json({ token });
+        return res.status(200).json();
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Server error' });

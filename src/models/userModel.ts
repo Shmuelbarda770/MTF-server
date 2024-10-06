@@ -1,5 +1,19 @@
 import { Schema, model } from 'mongoose';
 
+export interface IUser extends Document {
+  Id: Number,
+  role: String, 
+  FirstName: String,
+  LastName: String,
+  PhoneNumber: String,
+  Email: String,
+  AccountName: String,
+  CompanyName: String,
+  InvoiceName: String,
+
+}
+
+
 // Define the User schema
 const userSchema = new Schema({
   Id: { type: Number, required: true },
@@ -14,6 +28,6 @@ const userSchema = new Schema({
 });
 
 // Create the User model
-const User = model('User', userSchema);
+const User = model<IUser>('User', userSchema);
 
 export default User;

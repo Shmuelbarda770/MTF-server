@@ -2,7 +2,11 @@ import { Request, Response } from 'express';
 import { createApiResponse, ApiResponse } from '../util/ApiResponse';
 import { getCollection, connect, close } from '../util/Mongo';
 import mongoose from 'mongoose';
-import User from '../models/userModel';
+import User ,{IUser} from '../models/userModel';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { validateGmail } from '../util/validate';
+
 export const createUser :any= async (req: Request, res: Response) => {
     const userData = req.body;
 
@@ -28,8 +32,6 @@ export const createUser :any= async (req: Request, res: Response) => {
         await close(); 
     }
 };
-
-
 
 export const getAllUsers = async (req: Request, res: Response) => {
     try {
@@ -86,3 +88,22 @@ export const searchInput = async (req: Request, res: Response) => {
     }
 };
 
+export const login: any = async (req: Request, res: Response) => {
+    const { Email } = req.body;
+
+    try {
+        // חיפוש משתמש במסד הנתונים
+        const user: IUser | null = await User.findOne({ Email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // יצירת טוקן
+        const token = jwt.sign({ id: user.Id }, 'YOUR_SECRET_KEY', { expiresIn: '1h' });
+
+        return res.status(200).json({ token });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};

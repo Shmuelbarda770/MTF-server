@@ -1,5 +1,4 @@
 {
-  
   "name": "improve-server",
   "version": "1.0.0",
   "main": "index.js",
@@ -12,8 +11,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/cors": "^2.8.17",
     "@types/mongodb": "4.0.7",
-    "cors": "2.8.5",
+    "cors": "^2.8.5",
     "dotenv": "16.4.5",
     "express": "4.21.0",
     "install": "0.13.0",

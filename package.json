@@ -1,97 +1,38 @@
 {
-  
   "name": "improve-server",
-  
   "version": "1.0.0",
-  
   "main": "index.js",
-  
   "scripts": {
-  
-    
-  "build": "tsc",
-  
-    
-  "start": "node dist/app.js",
-  
-    
-  "dev": "nodemon --exec ts-node src/app.ts"
-  
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "dev": "nodemon --exec ts-node src/app.ts"
   },
-  
   "keywords": [],
-  
   "author": "",
-  
   "license": "ISC",
-  
   "dependencies": {
-  
-    
-  "@types/cors": "^2.8.17",
-  
-    
-  "@types/mongodb": "4.0.7",
-  
-    
-  "cors": "^2.8.5",
-  
-    
-  "dotenv": "16.4.5",
-  
-    
-  "express": "4.21.0",
-  
-    
-  "install": "0.13.0",
-  
-    
-  "mongodb": "6.9.0",
-  
-    
-  "mongoose": "^8.7.0",
-  
-    
-  "npm": "10.8.3",
-  
-    
-  "sequelize": "6.37.3",
-  
-    
-  "swagger-ui-express": "5.0.1",
-  
-    
-  "xlsx": "^0.18.5"
-  
+    "@types/cors": "^2.8.17",
+    "@types/mongodb": "4.0.7",
+    "cors": "^2.8.5",
+    "dotenv": "16.4.5",
+    "express": "4.21.0",
+    "install": "0.13.0",
+    "mongodb": "6.9.0",
+    "mongoose": "^8.7.0",
+    "npm": "10.8.3",
+    "sequelize": "6.37.3",
+    "swagger-ui-express": "5.0.1",
+    "xlsx": "^0.18.5"
   },
-  
   "devDependencies": {
-  
-    
-  "@types/express": "5.0.0",
-  
-    
-  "@types/mongoose": "5.11.97",
-  
-    
-  "@types/node": "22.7.2",
-  
-    
-  "@types/swagger-ui-express": "4.1.6",
-  
-    
-  "@types/xlsx": "^0.0.36",
-  
-    
-  "nodemon": "3.1.7",
-  
-    
-  "ts-node": "10.9.2",
-  
-    
-  "typescript": "5.6.2"
-  
+    "@types/express": "5.0.0",
+    "@types/mongoose": "5.11.97",
+    "@types/node": "22.7.2",
+    "@types/swagger-ui-express": "4.1.6",
+    "@types/xlsx": "^0.0.36",
+    "nodemon": "3.1.7",
+    "ts-node": "10.9.2",
+    "typescript": "5.6.2"
   },
-  
   "description": ""
 }

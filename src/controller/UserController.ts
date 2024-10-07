@@ -198,3 +198,18 @@ export const login: any = async (req: Request, res: Response) => {
         return res.status(500).json({ message: 'Server error' });
     }
 };
+
+export const checkEmail = async (req: Request, res: Response) => {
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+        if (user) {
+            res.json({ exists: true });
+        } else {
+            res.json({ exists: false });
+        }
+    } catch (error: any) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+}

@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { createApiResponse, ApiResponse } from '../util/ApiResponse';
 import { connect, close } from '../util/Mongo';
+import mongoose from 'mongoose';
+import User ,{IUser} from '../models/userModel';
+import { validateName, validateGmail, validateRole, validatePhoneNumber } from '../util/validate';
 import XLSX from 'xlsx';
-import User from '../models/userModel';
-import { validateId, validateName, validateGmail, validateRole, validatePhoneNumber } from '../util/validate';
-
 
 
 export const createUser: any = async (req: Request, res: Response) => {
@@ -39,13 +39,9 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     const userId = req.params.id;
     const updateData = req.body;
 
-    // ביצוע ולידציות
     const errors: string[] = [];
 
-    if (!validateId(Number(userId))) {
-        errors.push('Invalid user ID');
-    }
-
+  
     if (updateData.name && !validateName(updateData.name)) {
         errors.push('Invalid name');
     }
@@ -54,7 +50,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
         errors.push('Invalid Gmail address');
     }
 
-    const validRoles:any = ['admin', 'user', 'moderator']; // הגדרת תפקידים חוקיים
+    const validRoles: any = ['Admin', 'Viewer', 'Editor'];
     if (updateData.role && !validateRole(updateData.role, validRoles)) {
         errors.push('Invalid role');
     }
@@ -69,7 +65,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     }
 
     try {
-        // עדכון המשתמש לפי ID
+
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
 
         if (!updatedUser) {
@@ -77,8 +73,10 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
             return;
         }
 
+
         res.status(200).json(updatedUser);
     } catch (error: any) {
+        console.error('Error during user update:', error.message);
         res.status(500).json({ message: 'Error updating user', error: error.message });
     }
 };
@@ -154,42 +152,46 @@ export const getAllUsers = async (req: Request, res: Response) => {
         console.log(error);
         const response: ApiResponse = createApiResponse(false, null, "get all users from db failed", null, error.message);
         res.status(500).json(response);
-    } finally {
-        await close(); 
-    }
+    } 
 };
-
-export const searchInput = async (req: Request, res: Response) => {
+// This func send users by words from input
+export const searchInput: any = async (req: Request, res: Response) => {
     const { searchUsers } = req.body;
 
     try {
-        await connect();
+        await connect(); 
+        
         if (!searchUsers) {
-            res.status(400).json(createApiResponse(false, null, "Search term is required", null, null));
+            return res.status(400).json(createApiResponse(false, null, "Search term is required", null, null));
         }
 
         let users;
 
         if (searchUsers.trim() === '') {
             users = await User.find();
-        } else if (searchUsers.length > 1) {
-            users = await User.find({ username: { $regex: searchUsers, $options: 'i' } });
         } else {
-            users = await User.find({ username: searchUsers });
+            
+            users = await User.find({
+                $or: [
+                    { firstName: { $regex: searchUsers, $options: 'i' } },
+                    { lastName: { $regex: searchUsers, $options: 'i' } },
+                    { email: { $regex: searchUsers, $options: 'i' } },
+                    { phoneNumber: { $regex: searchUsers, $options: 'i' } }
+                ]
+            });
         }
 
-        const response: ApiResponse = createApiResponse(true, users, "Search results", null, null);
+        const response = createApiResponse(true, users, "Search results", null, null);
         res.status(200).json(response);
 
     } catch (error: any) {
         console.error(error);
-        const response: ApiResponse = createApiResponse(false, null, "Failed to retrieve users", null, error.message);
+        const response = createApiResponse(false, null, "Failed to retrieve users", null, error.message);
         res.status(500).json(response);
     } finally {
-        await close();
+        await close(); 
     }
-};
-
+    }
 export const deleteUser: any = async (req: Request, res: Response) => {
 
     const { email } = req.body;
@@ -210,5 +212,21 @@ export const deleteUser: any = async (req: Request, res: Response) => {
     } finally {
         await close();
     }
-}
+};
 
+export const login: any = async (req: Request, res: Response) => {
+    const { Email } = req.body;
+
+    try {
+        // חיפוש משתמש במסד הנתונים
+        const user: IUser | null = await User.findOne({ Email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        return res.status(200).json();
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};

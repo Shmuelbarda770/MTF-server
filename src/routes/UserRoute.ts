@@ -1,6 +1,5 @@
 import express from 'express';
-import {createUser, getAllUsers, searchInput, getSingleUser, updateUser, exportUsersList} from '../controller/UserController'; 
-
+import {createUser,getAllUsers,searchInput,login,getSingleUser,updateUser, exportUsersList} from '../controller/UserController'; 
 
 const router = express.Router();
 
@@ -13,6 +12,8 @@ router.get('/users/searchUsers', searchInput);
 router.get('/user/:id', getSingleUser);
 
 router.patch('/updateUser/:id', updateUser);
+
+router.post('/login', login);
 
 router.get('/export-users', exportUsersList)
 

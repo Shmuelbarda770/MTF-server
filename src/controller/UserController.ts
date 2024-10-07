@@ -109,6 +109,8 @@ export const getSingleUser: any = async (req: Request, res: Response) => {
     }
 };
 
+
+// This func send all user
 export const getAllUsers = async (req: Request, res: Response) => {
     try {
         await connect();
@@ -128,38 +130,44 @@ export const getAllUsers = async (req: Request, res: Response) => {
         res.status(500).json(response);
     } 
 };
-
+// This func send users by words from input
 export const searchInput = async (req: Request, res: Response) => {
     const { searchUsers } = req.body;
 
     try {
-        await connect();
+        await connect(); 
+        
         if (!searchUsers) {
-            res.status(400).json(createApiResponse(false, null, "Search term is required", null, null));
+            return res.status(400).json(createApiResponse(false, null, "Search term is required", null, null));
         }
 
         let users;
 
         if (searchUsers.trim() === '') {
             users = await User.find();
-        } else if (searchUsers.length > 1) {
-            users = await User.find({ username: { $regex: searchUsers, $options: 'i' } });
         } else {
-            users = await User.find({ username: searchUsers });
+            
+            users = await User.find({
+                $or: [
+                    { firstName: { $regex: searchUsers, $options: 'i' } },
+                    { lastName: { $regex: searchUsers, $options: 'i' } },
+                    { email: { $regex: searchUsers, $options: 'i' } },
+                    { phoneNumber: { $regex: searchUsers, $options: 'i' } }
+                ]
+            });
         }
 
-        const response: ApiResponse = createApiResponse(true, users, "Search results", null, null);
+        const response = createApiResponse(true, users, "Search results", null, null);
         res.status(200).json(response);
 
     } catch (error: any) {
         console.error(error);
-        const response: ApiResponse = createApiResponse(false, null, "Failed to retrieve users", null, error.message);
+        const response = createApiResponse(false, null, "Failed to retrieve users", null, error.message);
         res.status(500).json(response);
     } finally {
-        await close();
+        await close(); 
     }
-};
-
+    }
 export const deleteUser: any = async (req: Request, res: Response) => {
 
     const { email } = req.body;

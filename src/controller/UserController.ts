@@ -1,15 +1,13 @@
 import { Request, Response } from 'express';
 import { createApiResponse, ApiResponse } from '../util/ApiResponse';
 import { connect, close } from '../util/Mongo';
-import mongoose from 'mongoose';
 import User ,{IUser} from '../models/userModel';
 import { validateName, validateGmail, validateRole, validatePhoneNumber } from '../util/validate';
 
+// This function  connect to mongodb and try to add user in db
 export const createUser: any = async (req: Request, res: Response) => {
     const userData = req.body;
-    console.log(userData)
     
-    console.log('1');
     try {
         await connect();
         const existingUser = await User.findOne({ email: userData.email });
@@ -32,7 +30,7 @@ export const createUser: any = async (req: Request, res: Response) => {
     }
 };
 
-// עדכון משתמש קיים
+// This function connect to mongodb and update try to user in db 
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
     const userId = req.params.id;
     const updateData = req.body;
@@ -63,15 +61,11 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     }
 
     try {
-
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
-
         if (!updatedUser) {
             res.status(404).json({ message: 'User not found' });
             return;
         }
-
-
         res.status(200).json(updatedUser);
     } catch (error: any) {
         console.error('Error during user update:', error.message);
@@ -104,18 +98,17 @@ export const getSingleUser: any = async (req: Request, res: Response) => {
         const response: ApiResponse = createApiResponse(false, null, "Failed to retrieve user.", null, error.message);
         res.status(500).json(response);
        
-    }finally {
-        await close(); 
     }
 };
 
 
-// This func send all user
+// This function connect to mongodb and try to send all users to clint
 export const getAllUsers = async (req: Request, res: Response) => {
     try {
         await connect();
         const users = await User.find();
         if (users.length > 0) {
+            
             const response: ApiResponse = createApiResponse(true, users, "get all users from db", null, null);
             res.status(200).json(response);
         } else {
@@ -123,78 +116,70 @@ export const getAllUsers = async (req: Request, res: Response) => {
             res.status(400).json(response);
         }
 
-
     } catch (error: any) {
         console.log(error);
         const response: ApiResponse = createApiResponse(false, null, "get all users from db failed", null, error.message);
         res.status(500).json(response);
     } 
 };
-// This func send users by words from input
-export const searchInput = async (req: Request, res: Response) => {
-    const { searchUsers } = req.body;
 
+// This function connect to mongodb and try to send users by words from input
+export const searchInput:any= async (req: Request, res: Response) => {
+    const  {inputWords}  = req.body;
     try {
         await connect(); 
-        
-        if (!searchUsers) {
+      
+        if (!inputWords) {
             return res.status(400).json(createApiResponse(false, null, "Search term is required", null, null));
         }
 
         let users;
-
-        if (searchUsers.trim() === '') {
+        if (inputWords.trim() === '') {
             users = await User.find();
-        } else {
-            
+        } else { 
+            // Checks if the received word exists in the variables
             users = await User.find({
                 $or: [
-                    { firstName: { $regex: searchUsers, $options: 'i' } },
-                    { lastName: { $regex: searchUsers, $options: 'i' } },
-                    { email: { $regex: searchUsers, $options: 'i' } },
-                    { phoneNumber: { $regex: searchUsers, $options: 'i' } }
+                    { firstName: { $regex: inputWords, $options: 'i' } },
+                    { lastName: { $regex: inputWords, $options: 'i' } },
+                    { email: { $regex: inputWords, $options: 'i' } },
+                    { phoneNumber: { $regex: inputWords, $options: 'i' } }
                 ]
             });
-        }
-
+        };
         const response = createApiResponse(true, users, "Search results", null, null);
         res.status(200).json(response);
-
     } catch (error: any) {
         console.error(error);
         const response = createApiResponse(false, null, "Failed to retrieve users", null, error.message);
         res.status(500).json(response);
-    } finally {
-        await close(); 
+    } 
     }
-    }
+    // This function delete user by button "DeleteUser.tsx"
 export const deleteUser: any = async (req: Request, res: Response) => {
 
     const { email } = req.body;
     try {
         await connect();
-        const user = await User.findOne({ email : email })
+        const user = await User.findOne({ email : email });
         if (!user) {
             return res.status(404).json(createApiResponse(false, null, "User not found", null, null));
         }
-        await User.deleteOne({ email })
+        await User.deleteOne({ email });
         const response: ApiResponse = createApiResponse(true, { email }, "User deleted");
         res.status(200).json(response);
 
     } catch (error: any) {
         const response: ApiResponse = createApiResponse(false, null, "user not deleted", null, error.message);
         res.status(500).json(response);
-
-    } finally {
-        await close();
-    }
+    } 
 };
-
+//  This function checks if the user exists, if so then it will send a positive answer
 export const login: any = async (req: Request, res: Response) => {
     const { Email } = req.body;
 
     try {
-        // חיפוש משתמש במסד הנתונים
+       
         const user: IUser | null = await User.findOne({ Email });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });

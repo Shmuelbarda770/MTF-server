@@ -7,7 +7,7 @@ router.post('/createUser', createUser);
 
 router.get('/users',getAllUsers);
 
-router.get('/users/searchUsers', searchInput);
+router.post('/users/searchUsers', searchInput);
 
 router.get('/user/:id', getSingleUser);
 

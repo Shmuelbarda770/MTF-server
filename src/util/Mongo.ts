@@ -14,8 +14,6 @@ export const connect = async () => {
       console.error('MongoDB connection error:', error);
       throw error;
     }
-  } else {
-    console.log('MongoDB already connected');
   }
 };
 

@@ -189,8 +189,8 @@ export const deleteUser: any = async (req: Request, res: Response) => {
         if (!user) {
             return res.status(404).json(createApiResponse(false, null, "User not found", null, null));
         }
-        await User.deleteOne({ email });
-        const response: ApiResponse = createApiResponse(true, { email }, "User deleted");
+        await User.deleteOne({ email })
+        const response: ApiResponse = createApiResponse(true, { email }, "User deleted", null, null);
         res.status(200).json(response);
 
     } catch (error: any) {

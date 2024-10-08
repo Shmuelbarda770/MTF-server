@@ -1,5 +1,5 @@
 import express from 'express';
-import {createUser,getAllUsers,searchInput,login,checkEmail,getSingleUser,updateUser, exportUsersList} from '../controller/UserController'; 
+import {createUser,getAllUsers,searchInput,login,getSingleUser,updateUser,deleteUser,checkEmail,exportUsersList} from '../controller/UserController'; 
 
 const router = express.Router();
 
@@ -13,10 +13,9 @@ router.get('/user/:id', getSingleUser);
 
 router.patch('/updateUser/:id', updateUser);
 
+
+router.delete('/users/deleteUser', deleteUser);
+
 router.post('/login', login);
-
-router.post('/checkEmail', checkEmail);
-
-router.get('/export-users', exportUsersList)
 
 export default router;

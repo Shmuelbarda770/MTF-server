@@ -200,33 +200,39 @@ export const deleteUser: any = async (req: Request, res: Response) => {
 };
 //  This function checks if the user exists, if so then it will send a positive answer
 export const login: any = async (req: Request, res: Response) => {
-    const { Email } = req.body;
+    const { email } = req.body;
 
     try {
-       
-        const user: IUser | null = await User.findOne({ Email });
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+        // בדוק אם המשתמש קיים בבסיס הנתונים
+        const user: IUser | null = await User.findOne({ email: email });
 
-        return res.status(200).json();
+        if (user) {
+            // אם המשתמש נמצא, החזר תשובה חיובית
+            res.status(200).json({ exists: true, message: 'User found, redirecting to OTP'});
+        } else {
+            // אם המשתמש לא נמצא, החזר הודעה מתאימה
+            res.status(404).json({ exists: false, message: 'Email not found' });
+        }
     } catch (error) {
+        // במקרה של שגיאת שרת
         console.error(error);
-        return res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
-export const checkEmail = async (req: Request, res: Response) => {
+export const checkEmail = async (req: Request, res: Response): Promise<void> => {
     const { email } = req.body;
 
     try {
         const user = await User.findOne({ email });
+
         if (user) {
-            res.json({ exists: true });
+            res.status(200).json({ exists: true });
         } else {
-            res.json({ exists: false });
+            res.status(404).json({ exists: false, message: 'Email not found' });
         }
     } catch (error: any) {
+        console.error('Server error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
-}
+};

@@ -182,7 +182,8 @@ export const searchInput:any= async (req: Request, res: Response) => {
     // This function delete user by button "DeleteUser.tsx"
 export const deleteUser: any = async (req: Request, res: Response) => {
 
-    const { email } = req.body;
+    const email = req.params.email;
+    
     try {
         await connect();
         const user = await User.findOne({ email : email });

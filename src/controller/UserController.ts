@@ -182,15 +182,16 @@ export const searchInput:any= async (req: Request, res: Response) => {
     // This function delete user by button "DeleteUser.tsx"
 export const deleteUser: any = async (req: Request, res: Response) => {
 
-    const { email } = req.body;
+    const email = req.params.email;
+    
     try {
         await connect();
         const user = await User.findOne({ email : email });
         if (!user) {
             return res.status(404).json(createApiResponse(false, null, "User not found", null, null));
         }
-        await User.deleteOne({ email });
-        const response: ApiResponse = createApiResponse(true, { email }, "User deleted");
+        await User.deleteOne({ email })
+        const response: ApiResponse = createApiResponse(true, { email }, "User deleted", null, null);
         res.status(200).json(response);
 
     } catch (error: any) {

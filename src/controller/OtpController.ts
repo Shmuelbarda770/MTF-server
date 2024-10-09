@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
-import OTP, { insertOTP } from '../models/otpModel'; // Adjust the path as necessary
+import OTP, { insertOTP } from '../models/otpModel';
 import nodemailer from 'nodemailer';
 import axios from 'axios';
 
-// Replace these with your OAuth2 credentials
 
 // Function to get an access token
 async function getAccessToken() {
@@ -31,7 +30,7 @@ async function sendOTPEmail(userEmail: string, otp: string) {
     service: 'gmail',
     auth: {
       type: 'OAuth2',
-      user: 'stopetaco@gmail.com', // Replace with your email
+      user: 'stopetaco@gmail.com', 
       clientId: process.env.YOUR_CLIENT_ID,
       clientSecret: process.env.YOUR_CLIENT_SECRET,
       refreshToken: process.env.YOUR_REFRESH_TOKEN,
@@ -40,7 +39,7 @@ async function sendOTPEmail(userEmail: string, otp: string) {
   });
 
   const mailOptions = {
-    from: 'stopetaco@gmail.com', // Replace with your email
+    from: 'stopetaco@gmail.com', 
     to: userEmail,
     subject: 'Your OTP Code',
     text: `Your OTP code is ${otp}. It is valid for 60 minutes.`,
@@ -53,15 +52,12 @@ async function sendOTPEmail(userEmail: string, otp: string) {
 export const sendOTPToEmail: any = async (req: Request, res: Response) => {
   const { email } = req.body;
 
-  // Ensure email is provided
   if (!email) {
     return res.status(400).json({ message: 'Email is required' });
   }
 
   try {
-    // Generate and store OTP in the database
     const newOTP = await insertOTP(email);
-    // Send OTP to the user's email
     await sendOTPEmail(email, newOTP.otpCode);
     res.status(200).json({ message: 'OTP sent successfully', otpId: newOTP._id });
   } catch (error) {

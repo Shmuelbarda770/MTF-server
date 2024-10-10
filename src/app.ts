@@ -3,6 +3,8 @@ import SwaggerUI from 'swagger-ui-express';
 import Route from './routes/Route';
 import cors from 'cors';
 import { connect } from './util/Mongo'; // Import the MongoDB connection function
+import dotenv from 'dotenv';
+dotenv.config();
 
 const swagger = require('../swagger.json');
 

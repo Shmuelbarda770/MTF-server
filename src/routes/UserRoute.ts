@@ -13,7 +13,7 @@ router.get('/user/:id', getSingleUser);
 
 router.patch('/updateUser/:id', updateUser);
 
-router.post('/checkEmail', checkEmail);
+router.post('/check-email', checkEmail);
 
 router.get('/export-users', exportUsersList)
 

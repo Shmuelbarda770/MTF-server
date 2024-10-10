@@ -4,6 +4,7 @@ import { connect, close } from '../util/Mongo';
 import User ,{IUser} from '../models/userModel';
 import { validateName, validateGmail, validateRole, validatePhoneNumber } from '../util/validate';
 import XLSX from 'xlsx';
+import { generateAndSendOTP } from './OtpController';
 
 
 // This function  connect to mongodb and try to add user in db
@@ -204,22 +205,19 @@ export const login: any = async (req: Request, res: Response) => {
     const { email } = req.body;
 
     try {
-        // בדוק אם המשתמש קיים בבסיס הנתונים
         const user: IUser | null = await User.findOne({ email: email });
 
         if (user) {
-            // אם המשתמש נמצא, החזר תשובה חיובית
             res.status(200).json({ exists: true, message: 'User found, redirecting to OTP'});
         } else {
-            // אם המשתמש לא נמצא, החזר הודעה מתאימה
             res.status(404).json({ exists: false, message: 'Email not found' });
         }
     } catch (error) {
-        // במקרה של שגיאת שרת
         console.error(error);
         res.status(500).json({ message: 'Server error' });
     }
 };
+
 
 export const checkEmail = async (req: Request, res: Response): Promise<void> => {
     const { email } = req.body;
@@ -228,7 +226,8 @@ export const checkEmail = async (req: Request, res: Response): Promise<void> => 
         const user = await User.findOne({ email });
 
         if (user) {
-            res.status(200).json({ exists: true });
+            await generateAndSendOTP(email);
+            res.status(200).json({ exists: true, message: 'User found, OTP sent' });
         } else {
             res.status(404).json({ exists: false, message: 'Email not found' });
         }

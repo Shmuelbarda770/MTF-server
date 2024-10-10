@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import OTP, { insertOTP } from '../models/otpModel';
 import nodemailer from 'nodemailer';
 import axios from 'axios';
-
+import jwt from 'jsonwebtoken';
 
 // Function to get an access token
 async function getAccessToken() {
@@ -48,7 +48,19 @@ async function sendOTPEmail(userEmail: string, otp: string) {
   await transporter.sendMail(mailOptions);
 }
 
-// API route to handle OTP generation and email
+// Helper function to generate OTP and send email
+export const generateAndSendOTP = async (email: string) => {
+  try {
+    const newOTP = await insertOTP(email); // Generate and save OTP to database
+    await sendOTPEmail(email, newOTP.otpCode); // Send the OTP via email
+    return newOTP._id; // Return OTP ID if needed
+  } catch (error) {
+    console.error('Error generating and sending OTP:', error);
+    throw error;
+  }
+};
+
+// API route to handle OTP generation and email (uses helper function)
 export const sendOTPToEmail: any = async (req: Request, res: Response) => {
   const { email } = req.body;
 
@@ -57,11 +69,40 @@ export const sendOTPToEmail: any = async (req: Request, res: Response) => {
   }
 
   try {
-    const newOTP = await insertOTP(email);
-    await sendOTPEmail(email, newOTP.otpCode);
-    res.status(200).json({ message: 'OTP sent successfully', otpId: newOTP._id });
+    const otpId = await generateAndSendOTP(email);
+    res.status(200).json({ message: 'OTP sent successfully', otpId });
   } catch (error) {
-    console.error('Error sending OTP:', error);
     res.status(500).json({ message: 'Error sending OTP', error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+};
+
+// Function to verify OTP
+export const verifyOTP = async (req: Request, res: Response): Promise<void> => {
+  const { email, otpCode } = req.body;
+
+  // Check if both email and otpCode are provided
+  if (!email || !otpCode) {
+    res.status(400).json({ message: 'Email and OTP code are required' });
+    return;
+  }
+
+  try {
+    // Find the OTP record that matches the email and is active
+    const otpRecord = await OTP.findOne({ email, otpCode, status: 'active', expirationTime: { $gt: new Date() } });
+
+    if (!otpRecord) {
+      res.status(400).json({ message: 'Invalid or expired OTP' });
+      return;
+    }
+
+    otpRecord.status = 'used';
+    await otpRecord.save();
+
+    const token = jwt.sign({ email }, process.env.SECRET_KEY as string, { expiresIn: '1h' });
+
+    res.status(200).json({ message: 'OTP verified successfully', token, redirectUrl: '/users' });
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };

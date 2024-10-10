@@ -10,18 +10,17 @@ import {
   checkEmail, 
   exportUsersList 
 } from '../controller/UserController';
-import { authenticateToken } from '../middleware/authMiddleware'; // Import the auth middleware
 
 const router = express.Router();
 
-// Routes that require authentication
-router.post('/createUser', authenticateToken, createUser);
-router.get('/users', authenticateToken, getAllUsers);
-router.post('/users/searchUsers', authenticateToken, searchInput);
-router.get('/user/:id', authenticateToken, getSingleUser);
-router.patch('/updateUser/:id', authenticateToken, updateUser);
-router.get('/export-users', authenticateToken, exportUsersList);
-router.delete('/deleteUser/:email', authenticateToken, deleteUser);
+// Routes without authentication
+router.post('/createUser', createUser);
+router.get('/users', getAllUsers);
+router.post('/users/searchUsers', searchInput);
+router.get('/user/:id', getSingleUser);
+router.patch('/updateUser/:id', updateUser);
+router.get('/export-users', exportUsersList);
+router.delete('/deleteUser/:email', deleteUser);
 
 // Public routes
 router.post('/check-email', checkEmail); // Open to initiate email check

@@ -1,8 +1,9 @@
 import express from 'express';
-import { sendOTPToEmail } from '../controller/OtpController';
+import { sendOTPToEmail, verifyOTP } from '../controller/OtpController';
 
 const router = express.Router();
 
-router.post('/sendotpbyemail', sendOTPToEmail)
+router.post('/sendotpbyemail', sendOTPToEmail);
+router.post('/verify', verifyOTP); 
 
 export default router;

@@ -16,6 +16,8 @@ app.use(express.json());
 app.use(Route);
 app.use('/swagger', SwaggerUI.serve, SwaggerUI.setup(swagger));
 
+
+
 // Connect to MongoDB once when the server starts
 connect().then(() => {
   console.log('MongoDB connected successfully');

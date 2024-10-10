@@ -204,18 +204,14 @@ export const login: any = async (req: Request, res: Response) => {
     const { email } = req.body;
 
     try {
-        // בדוק אם המשתמש קיים בבסיס הנתונים
         const user: IUser | null = await User.findOne({ email: email });
 
         if (user) {
-            // אם המשתמש נמצא, החזר תשובה חיובית
             res.status(200).json({ exists: true, message: 'User found, redirecting to OTP'});
         } else {
-            // אם המשתמש לא נמצא, החזר הודעה מתאימה
             res.status(404).json({ exists: false, message: 'Email not found' });
         }
     } catch (error) {
-        // במקרה של שגיאת שרת
         console.error(error);
         res.status(500).json({ message: 'Server error' });
     }
@@ -230,7 +226,7 @@ export const checkEmail = async (req: Request, res: Response): Promise<void> => 
         if (user) {
             res.status(200).json({ exists: true });
         } else {
-            res.status(404).json({ exists: false, message: 'Email not found' });
+            res.status(200).json({ exists: false, message: 'Email not found' });
         }
     } catch (error: any) {
         console.error('Server error:', error);

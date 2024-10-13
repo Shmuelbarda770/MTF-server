@@ -6,6 +6,8 @@ import { validateName, validateGmail, validateRole, validatePhoneNumber } from '
 import XLSX from 'xlsx';
 import { generateAndSendOTP } from './OtpController';
 const { OAuth2Client } = require("google-auth-library");
+import jwt from 'jsonwebtoken';
+
 
 // This function  connect to mongodb and try to add user in db
 export const createUser: any = async (req: Request, res: Response) => {
@@ -318,7 +320,8 @@ export const checkToken = async (req: Request, res: Response) => {
     const userLohInGoogle = await User.findOne({ email });
 
     if (userLohInGoogle) {
-      res.status(200).json({ message: "Token verified successfully", email });
+      const token = jwt.sign({ email }, process.env.SECRET_KEY as string, { expiresIn: '1h' });
+      res.status(200).json({ message: "Token verified successfully", email, token });
     } else {
       res.status(400).json({ message: "Invalid token" });
     }

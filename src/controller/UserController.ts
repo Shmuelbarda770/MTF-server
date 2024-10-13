@@ -1,14 +1,10 @@
-import { Request, Response } from "express";
-import { createApiResponse, ApiResponse } from "../util/ApiResponse";
-import { connect, close } from "../util/Mongo";
-import User, { IUser } from "../models/userModel";
-import {
-  validateName,
-  validateGmail,
-  validateRole,
-  validatePhoneNumber,
-} from "../util/validate";
-import XLSX from "xlsx";
+import { Request, Response } from 'express';
+import { createApiResponse, ApiResponse } from '../util/ApiResponse';
+import { connect, close } from '../util/Mongo';
+import User ,{IUser} from '../models/userModel';
+import { validateName, validateGmail, validateRole, validatePhoneNumber } from '../util/validate';
+import XLSX from 'xlsx';
+import { generateAndSendOTP } from './OtpController';
 const { OAuth2Client } = require("google-auth-library");
 
 // This function  connect to mongodb and try to add user in db
@@ -250,63 +246,59 @@ export const searchInput: any = async (req: Request, res: Response) => {
 };
 // This function delete user by button "DeleteUser.tsx"
 export const deleteUser: any = async (req: Request, res: Response) => {
-  const { email } = req.body;
-  try {
-    await connect();
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      return res
-        .status(404)
-        .json(createApiResponse(false, null, "User not found", null, null));
-    }
-    await User.deleteOne({ email });
-    const response: ApiResponse = createApiResponse(
-      true,
-      { email },
-      "User deleted"
-    );
-    res.status(200).json(response);
-  } catch (error: any) {
-    const response: ApiResponse = createApiResponse(
-      false,
-      null,
-      "user not deleted",
-      null,
-      error.message
-    );
-    res.status(500).json(response);
-  }
+
+    const email = req.params.email;
+    
+    try {
+        await connect();
+        const user = await User.findOne({ email : email });
+        if (!user) {
+            return res.status(404).json(createApiResponse(false, null, "User not found", null, null));
+        }
+        await User.deleteOne({ email })
+        const response: ApiResponse = createApiResponse(true, { email }, "User deleted", null, null);
+        res.status(200).json(response);
+
+    } catch (error: any) {
+        const response: ApiResponse = createApiResponse(false, null, "user not deleted", null, error.message);
+        res.status(500).json(response);
+    } 
 };
 //  This function checks if the user exists, if so then it will send a positive answer
 export const login: any = async (req: Request, res: Response) => {
-  const { Email } = req.body;
+    const { email } = req.body;
 
-  try {
-    const user: IUser | null = await User.findOne({ Email });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    try {
+        const user: IUser | null = await User.findOne({ email: email });
+
+        if (user) {
+            res.status(200).json({ exists: true, message: 'User found, redirecting to OTP'});
+        } else {
+            res.status(404).json({ exists: false, message: 'Email not found' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
-
-    return res.status(200).json();
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
-  }
 };
 
-export const checkEmail = async (req: Request, res: Response) => {
-  const { email } = req.body;
 
-  try {
-    const user = await User.findOne({ email });
-    if (user) {
-      res.json({ exists: true });
-    } else {
-      res.json({ exists: false });
+export const checkEmail = async (req: Request, res: Response): Promise<void> => {
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (user) {
+            await generateAndSendOTP(email);
+            res.status(200).json({ exists: true, message: 'User found, OTP sent' });
+        } else {
+            res.status(404).json({ exists: false, message: 'Email not found' });
+        }
+    } catch (error: any) {
+        console.error('Server error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
-  } catch (error: any) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
 };
 
 export const checkToken = async (req: Request, res: Response) => {

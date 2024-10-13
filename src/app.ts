@@ -1,18 +1,22 @@
-import express, { Request, Response } from 'express';
+
+import express from 'express';
 import SwaggerUI from 'swagger-ui-express';
 import Route from './routes/Route';
 import cors from 'cors';
 import { connect } from './util/Mongo'; // Import the MongoDB connection function
-
+import passport from 'passport';
 const swagger = require('../swagger.json');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+
+app.use(passport.initialize());
 app.use(cors());
 app.use(express.json());
 app.use(Route);
 app.use('/swagger', SwaggerUI.serve, SwaggerUI.setup(swagger));
+
 
 // Connect to MongoDB once when the server starts
 connect().then(() => {

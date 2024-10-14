@@ -1,26 +1,38 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-
+// Define an interface for the document structure
 interface ISite extends Document {
   name: string;
   address: string;
+  coordinates: [number, number]; // [longitude, latitude]
   creationDate: Date;
   lastUpdated: Date;
 }
 
+// Define the schema for the collection
 const SiteSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
     address: { type: String, required: true },
+    coordinates: {
+      type: [Number], // An array of numbers: [longitude, latitude]
+      required: true,
+      validate: {
+        validator: function (arr: number[]) {
+          return arr.length === 2;
+        },
+        message: 'Coordinates must be an array with two elements [longitude, latitude]',
+      },
+    },
     creationDate: { type: Date, default: Date.now },
     lastUpdated: { type: Date, default: Date.now },
   },
   {
-    timestamps: true, // This option automatically adds `createdAt` and `updatedAt` fields
+    timestamps: true, // Automatically adds `createdAt` and `updatedAt`
   }
 );
 
-
+// Pre-save middleware to update the `lastUpdated` field before each save
 SiteSchema.pre<ISite>('save', function (next) {
   this.lastUpdated = new Date();
   next();

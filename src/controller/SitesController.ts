@@ -38,3 +38,32 @@ export const getAllSites = async (req: Request, res: Response) => {
       
   }    
 };
+
+export const searchSites: any = async (req: Request, res: Response) => {
+  const { searchTerm } = req.body;
+
+  try {
+    if (!searchTerm) {
+      return res.status(400).json(createApiResponse(false, null, "Search term is required", null, null));
+    }
+
+    let sites;
+    if (searchTerm.trim() === "") {
+      sites = await Site.find();
+    } else {
+      sites = await Site.find({
+        $or: [
+          { name: { $regex: searchTerm, $options: "i" } },
+          { address: { $regex: searchTerm, $options: "i" } },
+        ],
+      });
+    }
+
+    const response = createApiResponse(true, sites, "Search results", null, null);
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error(error);
+    const response = createApiResponse(false, null, "Failed to retrieve sites", null, error.message);
+    res.status(500).json(response);
+  }
+};

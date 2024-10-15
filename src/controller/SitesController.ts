@@ -86,5 +86,23 @@ export const updateSide = async (req: Request, res: Response): Promise<void> => 
         res.status(500).json({ message: "Internal server error" });
     }
 };
-  
+
+export const getAllSites = async (req: Request, res: Response) => {
+    try {
+      await connect();
+      const sites = await Site.find();
+      if (sites.length > 0) {
+        const response = createApiResponse(true, sites, "Fetched all sites successfully", null, null);
+        res.status(200).json(response);
+      } else {
+        const response = createApiResponse(true,sites,"No sites found",null,null);
+        res.status(404).json(response);
+      }
+    } catch (error: any) {
+      console.error('Error fetching sites:', error);
+      const response = createApiResponse(false,null,"Failed to fetch sites",null,error.message);
+      res.status(500).json(response);
+        
+    }    
+  };
   

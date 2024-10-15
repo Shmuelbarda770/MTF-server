@@ -9,7 +9,7 @@ import {
   updateUser, 
   exportUsersList, 
   deleteUser, 
-  checkToken 
+  checkToken
 } from '../controller/UserController'; 
 import { authenticateToken } from '../util/authMiddleware';
 

@@ -1,9 +1,10 @@
 import express from 'express';
-import { deleteSite, getAllSites } from '../controller/SitesController';
+import { deleteSite ,getAllSites,createSite} from '../controller/SitesController';
 
 const router = express.Router();
 
-router.delete('/deletesite/:id', deleteSite)
+router.delete('/deletesite/:id', deleteSite);
 router.post('/getAllSites', getAllSites)
+router.delete('/createSite', createSite);
 
 export default router;

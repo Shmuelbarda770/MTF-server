@@ -205,18 +205,13 @@ export const searchInput: any = async (req: Request, res: Response) => {
     await connect();
 
     if (!inputWords) {
-      return res
-        .status(400)
-        .json(
-          createApiResponse(false, null, "Search term is required", null, null)
-        );
+      return res.status(400).json(createApiResponse(false, null, "Search term is required", null, null));
     }
 
     let users;
     if (inputWords.trim() === "") {
       users = await User.find();
     } else {
-      // Checks if the received word exists in the variables
       users = await User.find({
         $or: [
           { firstName: { $regex: inputWords, $options: "i" } },
@@ -226,23 +221,11 @@ export const searchInput: any = async (req: Request, res: Response) => {
         ],
       });
     }
-    const response = createApiResponse(
-      true,
-      users,
-      "Search results",
-      null,
-      null
-    );
+    const response = createApiResponse(true,users,"Search results",null,null);
     res.status(200).json(response);
   } catch (error: any) {
     console.error(error);
-    const response = createApiResponse(
-      false,
-      null,
-      "Failed to retrieve users",
-      null,
-      error.message
-    );
+    const response = createApiResponse(false,null,"Failed to retrieve users",null,error.message);
     res.status(500).json(response);
   }
 };
@@ -295,7 +278,7 @@ export const checkEmail = async (req: Request, res: Response): Promise<void> => 
             await generateAndSendOTP(email);
             res.status(200).json({ exists: true, message: 'User found, OTP sent' });
         } else {
-            res.status(404).json({ exists: false, message: 'Email not found' });
+            res.status(200).json({ exists: false, message: 'Email not found' });
         }
     } catch (error: any) {
         console.error('Server error:', error);

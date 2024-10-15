@@ -6,7 +6,6 @@ import { createApiResponse, ApiResponse } from '../util/ApiResponse';
 import { Request, Response } from 'express';
 
 
-
 // Controller function to delete a site by its ID
 export const deleteSite = async (req: Request, res: Response): Promise<void> => {
     try {

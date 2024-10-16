@@ -4,7 +4,7 @@ import { deleteSite ,getAllSites, searchSites,createSite} from '../controller/Si
 const router = express.Router();
 
 router.delete('/deleteSite/:id', deleteSite);;
-router.post('/getAllSites', getAllSites);
+router.get('/getAllSites', getAllSites);
 router.post('/searchSites', searchSites);
 router.delete('/createSite', createSite);
 

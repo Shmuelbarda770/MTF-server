@@ -7,6 +7,7 @@ import XLSX from 'xlsx';
 import { generateAndSendOTP } from './OtpController';
 const { OAuth2Client } = require("google-auth-library");
 import jwt from 'jsonwebtoken';
+import axios from 'axios';
 
 
 // This function  connect to mongodb and try to add user in db
@@ -291,22 +292,21 @@ export const checkToken = async (req: Request, res: Response) => {
 
   try {
     await connect();
-      
-    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
-    const email = payload.email;
-    const userLohInGoogle = await User.findOne({ email });
+    const googleResponse = await axios.get(`https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${token}`);
+    
+    if (googleResponse.data.email) {
+      const email = googleResponse.data.email;
+      const userLohInGoogle = await User.findOne({ email });
 
-    if (userLohInGoogle) {
-      const token = jwt.sign({ email }, process.env.SECRET_KEY as string, { expiresIn: '1h' });
-      res.status(200).json({ message: "Token verified successfully", email, token });
+      if (userLohInGoogle) {
+        const jwtToken = jwt.sign({ email }, process.env.SECRET_KEY as string, { expiresIn: '1h' });
+        res.status(200).json({ message: "Token verified successfully", email, token: jwtToken });
+      } else {
+        res.status(400).json({ message: "User not found" });
+      }
     } else {
-      res.status(400).json({ message: "Invalid token" });
+      res.status(400).json({ message: "Invalid Google access token" });
     }
   } catch (error: any) {
     console.error("Error verifying token:", error.message);

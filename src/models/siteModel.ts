@@ -4,15 +4,18 @@ import mongoose, { Schema, Document } from 'mongoose';
 interface ISite extends Document {
   name: string;
   address: string;
+  description: string;
   coordinates: [number, number]; // [longitude, latitude]
   creationDate: Date;
   lastUpdated: Date;
+  status: string;
 }
 
 // Define the schema for the collection
 const SiteSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
+    description: {type: String},
     address: { type: String, required: true },
     coordinates: {
       type: [Number], // An array of numbers: [longitude, latitude]
@@ -26,6 +29,7 @@ const SiteSchema: Schema = new Schema(
     },
     creationDate: { type: Date, default: Date.now },
     lastUpdated: { type: Date, default: Date.now },
+    status: { type: String, enum: ['Active', 'Not Active'], default: 'Not Active'}
   },
   {
     timestamps: true, // Automatically adds `createdAt` and `updatedAt`

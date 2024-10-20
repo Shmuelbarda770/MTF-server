@@ -167,33 +167,15 @@ export const getAllUsers = async (req: Request, res: Response) => {
     await connect();
     const users = await User.find();
     if (users.length > 0) {
-      const response: ApiResponse = createApiResponse(
-        true,
-        users,
-        "get all users from db",
-        null,
-        null
-      );
+      const response: ApiResponse = createApiResponse(true, users, "get all users from db", null, null);
       res.status(200).json(response);
     } else {
-      const response: ApiResponse = createApiResponse(
-        true,
-        users,
-        "get all users from db failed no have users",
-        null,
-        null
-      );
+      const response: ApiResponse = createApiResponse(true, users, "get all users from db failed no have users", null, null);
       res.status(400).json(response);
     }
   } catch (error: any) {
     console.log(error);
-    const response: ApiResponse = createApiResponse(
-      false,
-      null,
-      "get all users from db failed",
-      null,
-      error.message
-    );
+    const response: ApiResponse = createApiResponse( false, null, "get all users from db failed", null, error.message);
     res.status(500).json(response);
   }
 };

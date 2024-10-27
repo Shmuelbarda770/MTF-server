@@ -3,6 +3,8 @@ import { connect } from '../util/Mongo';
 import { createApiResponse } from '../util/ApiResponse';
 import Site from '../models/siteModel'; // Assuming the model is in the models folder
 import { ApiResponse } from '../util/ApiResponse';
+import XLSX from 'xlsx';
+
 
 // Controller function to delete a site by its ID
 export const deleteSite = async (req: Request, res: Response): Promise<void> => {
@@ -155,5 +157,30 @@ export const searchSites: any = async (req: Request, res: Response) => {
     console.error(error);
     const response = createApiResponse(false, null, "Failed to retrieve sites", null, error.message);
     res.status(500).json(response);
+  }
+};
+
+const exportSitesToExcel = async (): Promise<Buffer> => {
+  const users = await Site.find().lean();
+  const worksheet = XLSX.utils.json_to_sheet(users);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Sites");
+
+  return XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+};
+
+export const exportSiteList = async (req: Request, res: Response) => {
+  try {
+    await connect();
+    const excelData = await exportSitesToExcel();
+    res.setHeader("Content-Disposition", "attachment; filename=Sites-list.xlsx");
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.send(excelData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error exporting users");
   }
 };

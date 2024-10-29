@@ -24,7 +24,6 @@ export const deleteSite = async (req: Request, res: Response): Promise<void> => 
 // This function creates a site in the db
 export const createSite: any = async (req: Request, res: Response) => {
   const siteData: any = req.body;
-  console.log(siteData);
   try {
     await connect();
     const existSite = await Site.findOne({ address: siteData.address });
@@ -46,7 +45,7 @@ export const createSite: any = async (req: Request, res: Response) => {
 
 export const getSiteById: any = async (req: Request, res: Response) => {
   const siteId: any = req.params.id;
-
+  console.log();
   try {
     const existSite = await Site.findById(siteId);
 
@@ -63,26 +62,52 @@ export const getSiteById: any = async (req: Request, res: Response) => {
   }
 };
 
+// export const updateSide = async (req: Request, res: Response): Promise<void> => {
+//   const address: string = req.params.address;
+//   const updateData: any = req.body;
+
+//   try {
+  
+//     const updatedSite = await Site.findOneAndUpdate({ address }, updateData, {
+//       new: true,
+//       runValidators: true,
+//     });
+
+//     if (!updatedSite) {
+//       res.status(404).json({ message: "Site not found" });
+//       return;
+//     }
+
+//     res.status(200).json(updatedSite);
+//   } catch (error: any) {
+//     console.error("Error during site update:", error.message);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
 export const updateSide = async (req: Request, res: Response): Promise<void> => {
-  const siteId = req.params.id;
-  const updateData = req.body;
+  const siteId: string = req.params.id;  // עדכון ל-ID
+  const updateData: any = req.body;
 
   try {
-    const updateSide = await Site.findByIdAndUpdate(siteId, updateData, {
+    const updatedSite = await Site.findByIdAndUpdate(siteId, updateData, {
       new: true,
       runValidators: true,
     });
 
-    if (!updateSide) {
-      res.status(404).json({ message: "User not found" });
+    if (!updatedSite) {
+      res.status(404).json({ message: "Site not found" });
+      return;
     }
 
-    res.status(200).json(updateSide);
+    res.status(200).json(updatedSite);
   } catch (error: any) {
-    console.error("Error during user update:", error.message);
+    console.error("Error during site update:", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+
 
 export const getAllSites = async (req: Request, res: Response) => {
   try {

@@ -26,21 +26,11 @@ export const createUser: any = async (req: Request, res: Response) => {
     const user = new User(userData);
     await user.save();
 
-    const response: ApiResponse = createApiResponse(
-      true,
-      user,
-      "User created successfully."
-    );
+    const response: ApiResponse = createApiResponse(true, user, "User created successfully.");
     res.status(201).json(response);
   } catch (error: any) {
     console.log(error);
-    const response: ApiResponse = createApiResponse(
-      false,
-      null,
-      "User creation failed",
-      null,
-      error.message
-    );
+    const response: ApiResponse = createApiResponse(false, null, "User creation failed", null, error.message);
     res.status(500).json(response);
   } finally {
     await close();

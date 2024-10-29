@@ -3,6 +3,7 @@ import { connect } from '../util/Mongo';
 import { createApiResponse } from '../util/ApiResponse';
 import Site from '../models/siteModel'; // Assuming the model is in the models folder
 import { ApiResponse } from '../util/ApiResponse';
+import { log } from 'console';
 
 // Controller function to delete a site by its ID
 export const deleteSite = async (req: Request, res: Response): Promise<void> => {
@@ -133,10 +134,10 @@ export const searchSites: any = async (req: Request, res: Response) => {
   const { searchTerm } = req.body;
 
   try {
+    await connect();
     if (!searchTerm) {
       return res.status(400).json(createApiResponse(false, null, "Search term is required", null, null));
     }
-
     let sites;
     if (searchTerm.trim() === "") {
       sites = await Site.find();
@@ -145,12 +146,13 @@ export const searchSites: any = async (req: Request, res: Response) => {
         $or: [
           { name: { $regex: searchTerm, $options: "i" } },
           { address: { $regex: searchTerm, $options: "i" } },
+          { status: { $regex: searchTerm, $options: "i" } },
         ],
       });
     }
-
     const response = createApiResponse(true, sites, "Search results", null, null);
     res.status(200).json(response);
+    
   } catch (error: any) {
     console.error(error);
     const response = createApiResponse(false, null, "Failed to retrieve sites", null, error.message);

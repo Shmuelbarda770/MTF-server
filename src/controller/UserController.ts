@@ -259,7 +259,7 @@ export const checkEmail = async (req: Request, res: Response): Promise<void> => 
 
         if (user) {
             await generateAndSendOTP(email);
-            res.status(200).json({ exists: true, message: 'User found, OTP sent' });
+            res.status(200).json({ exists: true,  data: user.firstName,  message: 'User found, OTP sent' });
         } else {
             res.status(200).json({ exists: false, message: 'Email not found' });
         }
